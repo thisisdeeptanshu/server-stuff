@@ -1,0 +1,28 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<div id="file-download-container">
+    <p id="file-download">to&nbsp;download:&nbsp;/download/filename</p>
+</div>
+<div id="file-upload-container">
+    <a id="file-upload" href="/uploadfile">file upload</a>
+</div>
+<form action="#" method="post">
+    <div id="textarea-button">
+        <textarea name="text" placeholder="msg"></textarea>
+        <input type="submit" value="submit">
+    </div>
+</form>
+<div id="text-container-container"><div id="text-container"></div></div>
+<script>
+    let data = `<%= data %>`;
+    data.split("\n").reverse().forEach(element => {
+        if (element === "") return;
+        let sender = document.createElement("h1");
+        let msg = document.createElement("p");
+        sender.innerText = element.split(" ")[0].replace("-at-", " at ").split("?").join(" ");
+        msg.innerText = element.split(" ").slice(1, element.split(" ").length).join(", ");
+        document.getElementById("text-container").appendChild(sender);
+        document.getElementById("text-container").appendChild(msg);
+        document.getElementById("text-container").appendChild(document.createElement("hr"));
+    });
+</script>

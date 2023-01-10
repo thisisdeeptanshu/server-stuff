@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+
+:root {
+  color-scheme: dark;
+}
+body {
+  background-color: #1a1e2e;
+  color: white;
+  font-family: 'Raleway', sans-serif;
+}
+
+h1 {
+  font-size: 2.5em;
+}
+p {
+  font-size: 1.5em;
+}
+a {
+  color: white;
+}
+
+hr {
+  border: 1px solid #996EFF;
+}
+
+#text-container-container {
+  display: flex;
+  justify-content: center;
+}
+#text-container {
+  /* max-width: 70%; */
+  min-width: 70%;
+}
+
+textarea {
+  background-color: #1a1e2e;
+  border: 1px solid #996EFF;
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.5em;
+  height: 4em;
+  width: 80%;
+  padding: 10px;
+}
+textarea::placeholder {
+  color: rgb(204, 204, 204);
+}
+
+#textarea-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#textarea-button input[type=submit] {
+  transform: rotate(90deg);
+  color: white;
+  background-color: #1a1e2e;
+  border: none;
+  font-size: 1.5em;
+}
+
+#file-upload-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  margin-left: -70px;
+}
+#file-download-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  width: 350px;
+}
+#file-upload {
+  /* position: absolute; */
+  font-size: 2.5em;
+  transform: rotate(-90deg);
+}
+#file-download {
+  font-size: 2.5em;
+  transform: rotate(90deg);
+}
+
+input::file-selector-button {
+  background-color: #1a1e2e;
+  padding: 10px;
+  border: 1px solid white;
+}

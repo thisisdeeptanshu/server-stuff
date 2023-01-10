@@ -24,7 +24,9 @@ const app = express()
 const port = 3000
 
 app.use(express.urlencoded());
-app.set('trust proxy', true)
+app.use(express.static(__dirname + '/css'));
+app.set("trust proxy", true)
+app.set("view engine", "ejs")
 
 app.get('/', (req, res) => {
     fs.readFile('msgs.txt', 'utf8', (err, data) => {
@@ -47,46 +49,37 @@ app.get('/', (req, res) => {
             `);
             return;
         }
-        res.send(`
-            to download: 192.168.0.129/download/filename<br><br>
-            <a href="/uploadfile">file upload</a><br><br>
-            <form action="#" method="post">
-                <textarea name="text" placeholder="msg"></textarea><br /><br />
-                <input type="submit" value="submit">
-            </form>
-        ` + data.replace(/\r/g, "").split("\n").reverse().join("<br>"))
+        res.render("main", {data: data});
     });
 })
 
 app.post("/", (req, res) => {
-    msg = "<h2>" + req.ip + "</h2>" + JSON.stringify(req.body).split("\"")[3] + "<hr>" + "\n"
+    if (JSON.stringify(req.body).split("\"")[3] == "") {
+        res.redirect("/");
+        return;
+    }
+    msg = req.ip + "-at-" + year + "-" + month + "-" + date + "?" + hours + ":" + minutes + ":" + seconds + " " + JSON.stringify(req.body).split("\"")[3] + "\n"
 
     fs.appendFile("msgs.txt", msg, function(err) {
         if(err) {
             return console.log("AHHHHHHHHH\n" + msg);
         }
-        console.log("written at " + year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
+        console.log("written at " + year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds); // FIXXXXX!!!
     });
 
     res.redirect("/");
 })
 
 app.get("/uploadfile", (req, res) => {
-    res.send(`
-        <a href="/">back</a><br><br>
-        <form id="uploadForm" enctype="multipart/form-data" action="#" method="post">
-        <input type="file" name="myfile" /><br/><br/>
-            <input type="submit" value="Upload">
-        </form>
-    `)
+    res.render("upload");
 })
 app.post('/uploadfile',function(req,res){  
     upload(req,res,function(err) {  
         if(err) {  
             console.log(err);
             return res.send("Error uploading file.");
-        }  
-        res.send("dooooooooooooooooooooooooooone");  
+        }
+        res.redirect("/uploadfile");
     });  
 });
 

@@ -64,7 +64,6 @@ app.post("/", (req, res) => {
         if(err) {
             return console.log("AHHHHHHHHH\n" + msg);
         }
-        console.log("written at " + year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds); // FIXXXXX!!!
     });
 
     res.redirect("/");

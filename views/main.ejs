@@ -20,7 +20,7 @@
         let sender = document.createElement("h1");
         let msg = document.createElement("p");
         sender.innerText = element.split(" ")[0].replace("-at-", " at ").split("?").join(" ");
-        msg.innerText = element.split(" ").slice(1, element.split(" ").length).join(", ");
+        msg.innerText = element.split(" ").slice(1, element.split(" ").length).join(" ");
         document.getElementById("text-container").appendChild(sender);
         document.getElementById("text-container").appendChild(msg);
         document.getElementById("text-container").appendChild(document.createElement("hr"));

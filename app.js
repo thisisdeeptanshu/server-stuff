@@ -29,7 +29,7 @@ app.set("trust proxy", true)
 app.set("view engine", "ejs")
 
 app.get('/', (req, res) => {
-    fs.readFile('msgs.txt', 'utf8', (err, data) => {
+    fs.readFile('msgs.txt', 'utf-8', (err, data) => {
         if (err) {
             console.error(`
             error?
@@ -46,6 +46,7 @@ app.get('/', (req, res) => {
             ⠀⠀⠀⣴⣿⣾⣿⣿⣿⡿⡽⡑⢌⠪⡢⡣⣣⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
             ⠀⠀⠀⡟⡾⣿⢿⢿⢵⣽⣾⣼⣘⢸⢸⣞⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
             ⠀⠀⠀⠀⠁⠇⠡⠩⡫⢿⣝⡻⡮⣒⢽⠋⠀⠀⠀⠀
+            ${err}
             `);
             return;
         }
@@ -53,26 +54,65 @@ app.get('/', (req, res) => {
     });
 })
 
+let msgToSend = "";
 app.post("/", (req, res) => {
-    if (JSON.stringify(req.body).split("\"")[3] == "") {
+    let body = req.body.text;
+    if (body == "" || body.indexOf("`") != -1) {
         res.redirect("/");
         return;
     }
-    msg = req.ip + "-at-" + year + "-" + month + "-" + date + "?" + hours + ":" + minutes + ":" + seconds + " " + JSON.stringify(req.body).split("\"")[3] + "\n"
 
-    fs.appendFile("msgs.txt", msg, function(err) {
-        if(err) {
-            return console.log("AHHHHHHHHH\n" + msg);
+    fs.readFile("names.txt", "utf8", (err, data) => {
+        let name = undefined;
+        let all_ids = data.split("\n");
+        all_ids.forEach(id => {
+            if (id.split(" ")[0] == req.ip) {
+                name = id.replace(req.ip + " ", "");
+            }
+        });
+        msg = name + "-at-" + year + "-" + month + "-" + date + "?" + hours + ":" + minutes + ":" + seconds + " " + body + "\n"
+        if (name == undefined) {
+            msgToSend = msg;
+            res.redirect("/name");
+            return;
+        }
+        fs.appendFile("msgs.txt", msg, function(err) {
+            if(err) {
+                return console.error(`AHHHHHHHHH\n${err}` + msg);
+            }
+        });
+        res.redirect("/");
+    });
+})
+
+app.get("/name", (req, res) => {
+    res.render("name");
+})
+app.post("/name", (req, res) => {
+    let name = req.body.name;
+    if (name == "") {
+        res.redirect("/");
+        return;
+    }
+    fs.appendFile("names.txt", req.ip + " " + name + "\n", (err) => {
+        if (err) {
+            return console.error(`AWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGA\n${err}`);
         }
     });
-
+    let msg = name + msgToSend;
+    msgToSend = "";
+    fs.appendFile("msgs.txt", msg, function(err) {
+        if(err) {
+            return console.error(`AHHHHHHHHH\n${err}` + msg);
+        }
+    });
     res.redirect("/");
 })
 
 app.get("/uploadfile", (req, res) => {
     res.render("upload");
 })
-app.post('/uploadfile',function(req,res){  
+app.post('/uploadfile', function(req,res){  
     upload(req,res,function(err) {  
         if(err) {  
             console.log(err);

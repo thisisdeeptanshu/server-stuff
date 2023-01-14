@@ -8,13 +8,13 @@
 </div>
 <form action="#" method="post">
     <div id="textarea-button">
-        <textarea name="text" placeholder="msg"></textarea>
+        <textarea name="text" placeholder="msg, the grave accent / back-tick ( ` ) is not allowed"></textarea>
         <input type="submit" value="submit">
     </div>
 </form>
 <div id="text-container-container"><div id="text-container"></div></div>
 <script>
-    let data = `<%= data %>`;
+    let data = `<%- data %>`;
     data.split("\n").reverse().forEach(element => {
         if (element === "") return;
         let sender = document.createElement("h1");

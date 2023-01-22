@@ -1,10 +1,13 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <div id="file-download-container">
-    <p id="file-download">to&nbsp;download:&nbsp;/download/filename</p>
+    <p id="file-download">to&nbsp;download:&nbsp;&sol;download&sol;filename</p>
 </div>
 <div id="file-upload-container">
     <a id="file-upload" href="/uploadfile">file upload</a>
+</div>
+<div id="ftp-container">
+    <a id="file-upload" href="/ftp">ftp</a>
 </div>
 <form action="#" method="post">
     <div id="textarea-button">
@@ -19,7 +22,7 @@
         if (element === "") return;
         let sender = document.createElement("h1");
         let msg = document.createElement("p");
-        sender.innerText = element.split(" ")[0].replace("-at-", " at ").split("?").join(" ");
+        sender.innerText = element.split(" ")[0].replace("-at-", " at ").split("?").join(" ").replace("|||", " ");
         msg.innerText = element.split(" ").slice(1, element.split(" ").length).join(" ");
         document.getElementById("text-container").appendChild(sender);
         document.getElementById("text-container").appendChild(msg);

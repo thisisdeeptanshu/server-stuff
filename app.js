@@ -2,6 +2,8 @@ const express = require('express')
 const fs = require('fs');
 const multer = require("multer")
 
+let lastUsed = "";
+
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, './uploads');
@@ -10,7 +12,16 @@ var storage = multer.diskStorage({
         callback(null, file.originalname);
     }
 });
+var storage2 = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, './temp-uploads');
+    },
+    filename: function (req, file, callback) {
+        callback(null, lastUsed.replace("|||", " ") + "." + file.originalname.split(".")[file.originalname.split(".").length - 1]);
+    }
+});
 var upload = multer({ storage : storage}).single('myfile');
+var upload2 = multer({ storage : storage2}).single('myfile');
 
 let date_ob = new Date();
 let date = ("0" + date_ob.getDate()).slice(-2);
@@ -32,7 +43,7 @@ app.get('/', (req, res) => {
     fs.readFile('msgs.txt', 'utf-8', (err, data) => {
         if (err) {
             console.error(`
-            error?
+            no success?
             ⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
             ⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
             ⠀⠀⢀⢀⢄⢬⢪⡪⡎⣆⡈⠚⠜⠕⠇⠗⠝⢕⢯⢫⣞⣯⣿⣻⡽⣏⢗⣗⠏⠀
@@ -70,12 +81,12 @@ app.post("/", (req, res) => {
                 name = id.replace(req.ip + " ", "");
             }
         });
-        msg = name + "-at-" + year + "-" + month + "-" + date + "?" + hours + ":" + minutes + ":" + seconds + " " + body + "\n"
+        msg = "-at-" + year + "-" + month + "-" + date + "?" + hours + ":" + minutes + ":" + seconds + " " + body + "\n"
         if (name == undefined) {
             msgToSend = msg;
             res.redirect("/name");
             return;
-        }
+        } else msg = name + msg;
         fs.appendFile("msgs.txt", msg, function(err) {
             if(err) {
                 return console.error(`AHHHHHHHHH\n${err}` + msg);
@@ -94,6 +105,7 @@ app.post("/name", (req, res) => {
         res.redirect("/");
         return;
     }
+    name = name.replace(" ", "|||")
     fs.appendFile("names.txt", req.ip + " " + name + "\n", (err) => {
         if (err) {
             return console.error(`AWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGAWOOGA\n${err}`);
@@ -112,8 +124,8 @@ app.post("/name", (req, res) => {
 app.get("/uploadfile", (req, res) => {
     res.render("upload");
 })
-app.post('/uploadfile', function(req,res){  
-    upload(req,res,function(err) {  
+app.post('/uploadfile', function(req, res){  
+    upload(req, res, function(err) {  
         if(err) {  
             console.log(err);
             return res.send("Error uploading file.");
@@ -123,13 +135,75 @@ app.post('/uploadfile', function(req,res){
 });
 
 app.get("/download/:fn", function(req, res) {
-    filename = req.params.fn
+    filename = req.params.fn;
 
-    res.download(__dirname+'/uploads/' + filename, function(err) {
+    res.download(__dirname + '/uploads/' + filename, function(err) {
         if(err) {
             console.log(err);
         }
     })
+})
+
+let merchants = [];
+let sellings = {};
+app.get("/ftp", function(req, res) {
+    // merchants.append(req.ip);
+    res.render("ftp", {merchants : merchants});
+})
+app.post("/ftp", (req, res) => {
+    fs.readFile("names.txt", "utf8", (err, data) => {
+        let name = undefined;
+        let all_ids = data.split("\n");
+        all_ids.forEach(id => {
+            if (id.split(" ")[0] == req.ip) {
+                name = id.replace(req.ip + " ", "");
+            }
+        });
+        if (name == undefined) {
+            name = req.ip;
+        }
+        
+        let index = merchants.indexOf(name);
+        if (index != -1) {
+            let fileName = name.replace("|||", " ");
+            merchants.splice(index, 1);
+            fs.readdir(__dirname + "/temp-uploads/", (err, files) => {
+                files.forEach(file => {
+                    if (file.includes(fileName)) {
+                        fs.unlink(__dirname + "/temp-uploads/" + file, (err) => {
+                            if (err) console.error(err);
+                        })
+                    }
+                });
+            });
+
+        } else {
+            merchants.push(name);
+            lastUsed = name;
+        }
+        upload2(req, res, function(err) {  
+            if(err) {  
+                console.log(err);
+                return res.send("Error uploading file.");
+            }
+        });
+        res.redirect("/ftp");
+    });
+})
+
+app.get("/ftpdownload/:ip", function(req, res) {
+    let fileName = req.params.ip.replace("|||", " ");
+    fs.readdir(__dirname + "/temp-uploads/", (err, files) => {
+        files.forEach(file => {
+            if (file.includes(fileName)) {
+                res.download(__dirname + '/temp-uploads/' + file, function(err) {
+                    if(err) {
+                        console.log(err);
+                    }
+                })
+            }
+        });
+    });
 })
 
 app.listen(port, "192.168.0.129", () => {

@@ -1,0 +1,23 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+<div style="text-align: center;">
+    <p style="font-family: 'Titty Fuck', cursive;font-size: 5em;">Pick Your Poison</p><br><br>
+    <form id="uploadForm" enctype="multipart/form-data" action="#" method="post">
+        <input type="submit" value="Join / Leave"><br><br>
+        <input style="font-size: 1.5em; background-color: #1a1e2e; border: none;" type="file" name="myfile" />
+    </form>
+    <div style="font-family: 'MedievalSharp', cursive;" id="merchants">
+        <br>
+    </div>
+</div>
+<script>
+    let merchants = "<%= merchants %>";
+    console.log(merchants);
+    merchants.split(",").forEach(element => {
+        let a = document.createElement("a");
+        a.innerText = element.replace("|||", " ");
+        a.style.fontSize = "2em";
+        a.setAttribute("class", "a-hover");
+        a.setAttribute("href", `/ftpdownload/${element}`)
+        document.getElementById("merchants").append(a);
+    });
+</script>
